@@ -1,13 +1,35 @@
-# GROUP 3: Randy Herrera, Thomas Perez, Jessica Kim, Al Azmine
-------------------------------------------------------------------
-## 
-In this assignment you will implement a simplified version of the Distance Vector Routing Protocol.
-The protocol will be run on top of four servers/laptops (behaving as routers) using TCP or UDP. Each
-server runs on a machine at a pre-defined port number. The servers should be able to output their
-forwarding tables along with the cost and should be robust to link changes. A server should send out
-routing packets only in the following two conditions: **a) periodic update** and **b) the user uses
-command asking for one**. This is a little different from the original algorithm which immediately sends
-out update routing information when routing table changes.
+# Group 3 Documentation
+  Members:   Randy Herrera, Thomas Perez, Jessica Kim, Al Azmine
+------------------------------------------------------------------------
+## Installation, Building, & Runtime
+**INSTALLATION**
+* Any IDE can be used.
+* The command prompt was not tried, but we used (at least) IntelliJ IDEA and NetBeans. 
+* **Requirements/prerequisites:**
+    *  At least, a JDK, JVM, and JRE are required to run the application. 
+* **GOAL:**
+    *  The goal is exactly what is explained in the ASMT2 prompt. Ie., at most four servers will be exchanging packet information.
+    *  However for demo' purposes, we're allowed to simulate this by displaying 4 terminals/consoles on the laptop/desktop display, such that each terminal/console will represent one-of-four servers which will contain its own discrete port number so that they can exchange/update information
+    *  In this assignment you will implement a simplified version of the Distance Vector Routing Protocol.
+    *  The protocol will be run on top of four servers/laptops (behaving as routers) using TCP or UDP.
+    *  Each server runs on a machine at a pre-defined port number.
+    *  The servers should be able to output their forwarding tables along with the cost and should be robust to link changes.
+    *  A server should send out routing packets only in the following two conditions: 
+          *  **a) periodic update**
+          *  **b) the user uses command asking for one**.
+
+*  *This is a little different from the original algorithm which immediately sends
+out update routing information when routing table changes.*
+
+**BUILD**
+* The initial, (and only) build of the various components, etc, are done via the IDE's Build tool. 
+
+**RUNTIME EXECUTION**
+* One can use "javac dv_routing.java", however it's easier, faster, and more convenient using the IDE's Run shortcut.
+------------------------------------------------------------------------
+
+
+
 
 ## 2. Getting Started
 [A distance vector routing protocol](https://en.wikipedia.org/wiki/Distance-vector_routing_protocol) uses the [Bellman-Ford Algorithm](https://en.wikipedia.org/wiki/Bellman%E2%80%93Ford_algorithm) or [Ford-Fulkerson Algorithm](https://en.wikipedia.org/wiki/Ford%E2%80%93Fulkerson_algorithm) or [Diffusing update Algorithm](https://en.wikipedia.org/wiki/Diffusing_update_algorithm). _We will be using Bellman-Ford Algorithm to calculate the cost of the paths._
