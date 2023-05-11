@@ -1,6 +1,6 @@
-# Distance Vector Protocol Algorithm Implementation
-
-## 1. Problem Statement
+# GROUP 3: Randy Herrera, Thomas Perez, Jessica Kim, Al Azmine
+------------------------------------------------------------------
+## 
 In this assignment you will implement a simplified version of the Distance Vector Routing Protocol.
 The protocol will be run on top of four servers/laptops (behaving as routers) using TCP or UDP. Each
 server runs on a machine at a pre-defined port number. The servers should be able to output their
