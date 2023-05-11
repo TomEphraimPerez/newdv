@@ -1,7 +1,7 @@
 # Group 3 Documentation
   Members:   Randy Herrera, Thomas Perez, Jessica Kim, Al Azmine
 ------------------------------------------------------------------------
-## Installation, Building, & Runtime
+## 1. Installation, Building, & Runtime
 **INSTALLATION**
 * Any IDE can be used.
 * The command prompt was not tried, but we used (at least) IntelliJ IDEA and NetBeans. 
