@@ -18,22 +18,22 @@ import asmt2.team3.test1.dv;
 
 public class Client extends Thread
 {
-    Set<SelectionKey> keys;
+    Set<SelectionKey> dvKeys;
+	SocketChannel socketChannel;
     Iterator<SelectionKey> selectedKeysIterator;
     ByteBuffer buffer = ByteBuffer.allocate(5000);
-    SocketChannel socketChannel;
     int bytesRead;
     public void run()
     {
         try {
         		while(true){
-        			int channelReady = dv.read.selectNow();
-        			keys = dv.read.selectedKeys();
-        			selectedKeysIterator = keys.iterator();
-        			if(channelReady!=0){
+        			int readChannel = dv.read.selectNow();
+        			dvKeys = dv.read.selectedKeys();
+        			selectedKeysIterator = dvKeys.iterator();
+        			if(readChannel!=0){
         				while(selectedKeysIterator.hasNext()){
-        					SelectionKey key = selectedKeysIterator.next();
-        					socketChannel = (SocketChannel)key.channel();
+        					SelectionKey dvKey = selectedKeysIterator.next();
+        					socketChannel = (SocketChannel)dvKey.channel();
         					try{
         						bytesRead = socketChannel.read(buffer);
         					}catch(IOException ie){
@@ -52,12 +52,12 @@ public class Client extends Thread
         						}
     							ObjectMapper mapper = new ObjectMapper();
     							Message msg = null;
-    							boolean messageReceived = false;
+    							boolean msgRecv = false;
     							int fromID = 0;
     							try{
 									msg = mapper.readValue(message,Message.class);
-									messageReceived = true;
-	    							dv.numPktsReceived++;
+									msgRecv = true;
+	    							dv.numberOfPacketsReceived++;
     			        			fromID = msg.getId();
     							}catch(JsonMappingException jme){
     								System.out.println("Server "+dv.parseChannelIp(socketChannel)+" crashed.");
@@ -65,46 +65,35 @@ public class Client extends Thread
     			        		Node fromNode = dv.getNodeById(fromID);
     			        		if(msg!=null){
     			        			
-    			        			if(msg.getType().equals("update") && messageReceived){
-    			        				List<String> receivedRT = msg.getRoutingTable();
-	        			        		Map<Node,Integer> createdReceivedRT = makeRT(receivedRT);
-	        			        		int presentCost = dv.routingTable.get(fromNode);
-	        			        		int updatedCost = createdReceivedRT.get(dv.myNode);
-	        			        		if(presentCost!=updatedCost){
+    			        			if(msg.getType().equals("update") && msgRecv){
+    			        				List<String> recvRT = msg.getRoutingTable();
+	        			        		Map<Node,Integer> createdRecvRT = makeRT(recvRT);
+	        			        		int currentCost = dv.routingTable.get(fromNode);
+	        			        		int updatedCost = createdRecvRT.get(dv.myNode);
+	        			        		if(currentCost!=updatedCost){
 	        			        			dv.routingTable.put(fromNode,updatedCost);
 	        			        		}
     			        			}
-	    			        		if(msg.getType().equals("step") && messageReceived) {
-	    			        			List<String> receivedRT = msg.getRoutingTable();
-	        			        		Map<Node,Integer> createdReceivedRT = makeRT(receivedRT);
+	    			        		if(msg.getType().equals("step") && msgRecv) {
+	    			        			List<String> recvRT = msg.getRoutingTable();
+	        			        		Map<Node,Integer> createdRecvRT = makeRT(recvRT);
 	        			        		for(Map.Entry<Node, Integer> entry1 : dv.routingTable.entrySet()){
 	        			        			if(entry1.getKey().equals(dv.myNode)){
 	        			        				continue;
 	        			        			}
 	        			        			else{
-	        			        				int presentCost = entry1.getValue();
-	        			        				int costToReceipient = createdReceivedRT.get(dv.myNode); 
-	        			        				int costToFinalDestination = createdReceivedRT.get(entry1.getKey());
-        			        					if(costToReceipient+costToFinalDestination < presentCost){
-        			        					dv.routingTable.put(entry1.getKey(),costToReceipient+costToFinalDestination);
+	        			        				int currentCost = entry1.getValue();
+	        			        				int costToReceipient = createdRecvRT.get(dv.myNode); 
+	        			        				int costToFinalDest = createdRecvRT.get(entry1.getKey());
+        			        					if(costToReceipient+costToFinalDest < currentCost){
+        			        					dv.routingTable.put(entry1.getKey(),costToReceipient+costToFinalDest);
         			        					dv.nextHop.put(entry1.getKey(),fromNode);
-	        			        				
-	        			        				/*if(dv.neighbors.contains(entry1.getKey())){
-	        			        					int receivedCost = createdReceivedRT.get(dv.myNode);
-	    			        						dv.routingTable.put(entry1.getKey(),receivedCost);
-	    			        						System.out.println("Server "+entry1.getKey().getId()+" updated with cost "+receivedCost+".");
-	        			        				}else{
-	        			        					if(dv.routingTable.get(fromNode)+createdReceivedRT.get(entry1.getKey())<presentCost){
-	        			        						dv.nextHop.put(entry1.getKey(), fromNode);
-	        			        						dv.routingTable.put(entry1.getKey(),dv.routingTable.get(fromNode)+createdReceivedRT.get(entry1.getKey()));
-	        			        						System.out.println("Server "+entry1.getKey().getId()+" updated with cost "+dv.routingTable.get(fromNode)+createdReceivedRT.get(entry1.getKey())+".");
-	        			        					}
-	        			        				}*/
+	        			        			
 	        			        			}
 	        			        		}
 	    			        		}
 	        					
-	    			        		if(msg.getType().equals("disable") || !messageReceived){
+	    			        		if(msg.getType().equals("disable") || !msgRecv){
 	    			        			dv.routingTable.put(fromNode, Integer.MAX_VALUE-2);
 	    			        			System.out.println("Routing Table updated with Server "+fromID+"'s cost set to infinity");
 	    			        			if(dv.isNeighbor(fromNode)){
@@ -155,18 +144,22 @@ public class Client extends Thread
         }
         
     }
-	private Map<Node, Integer> makeRT(List<String> receivedRT) {
-		Map<Node,Integer> rt = new HashMap<Node,Integer>();
-		for(String str:receivedRT){
+	private Map<Node, Integer> makeRT(List<String> recvRT) {
+		Map<Node,Integer> rTable = new HashMap<Node,Integer>();
+		for(String str:recvRT){
 			String[] parts = str.split("#");
 			int id = Integer.parseInt(parts[0]);
 			int cost = Integer.parseInt(parts[1]);
-			rt.put(dv.getNodeById(id), cost);
+			rTable.put(dv.getNodeById(id), cost);
 		}
-		return rt;
+		return rTable;
 	}
  
 }
+
+
+
+
 
 
 
