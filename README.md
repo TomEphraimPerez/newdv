@@ -88,8 +88,15 @@ server-1 to server-2 is equal to 4",
    * **getNodeById(int id)**
       * Simply grabs the server ID number of the node being requested
       * Called by many functions, especially needed for `update()` 
-* Contributed on Node class
-* Contributed on Crash command
+* Contributed on Node class --> `Node.java`
+   *  Set up constructor class to create nodes for each running server connected to its neighbors 
+   *  Includes serialization of Node called when creating new node objects in   `dv_routing.java` (the main file)
+   *  Used the server id, IP Address, and port fields to calculate a hash code for the Node object
+   *  Efficiently add new nodes to the routing table upon intialization
+* Contributed on Crash command --> `disable()`
+   * Calls `disable()` to safely close connections for any given server node ID and remove node from the network topology
+   * Updates `routingTable` to accomodate this change so costs and current nodes and neighbors are updated 
+   * Will throw errors if connection from server or from neighbors cannot be disabled
 * Set up demo environment, which consists of four virtual machines
    * The virtual machines were connected via a virtual subnet address 10.0.2.x.
    * Additionally, they were configured to generate a random MAC address, otherwise it would use the same MAC as the host machine.
