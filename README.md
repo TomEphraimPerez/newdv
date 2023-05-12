@@ -1,15 +1,19 @@
 # Group 3 Documentation
-  Members:   Randy Herrera, Thomas Perez, Jessica Kim, Al Azmine
+Members
+* Randy Herrera
+* Thomas Perez
+* Jessica Kim
+* Al Azmine
 ------------------------------------------------------------------------
 ## 1. Installation, Building, & Runtime
-**INSTALLATION**
+### INSTALLATION
 * Any IDE can be used.
 * The command prompt was not tried, but we used (at least) IntelliJ IDEA and NetBeans. 
 * **Requirements/prerequisites:**
     *  At least, a JDK, JVM, and JRE are required to run the application. 
 * **GOAL:**
     *  The goal is exactly what is explained in the ASMT2 prompt. Ie., at most four servers will be exchanging packet information.
-    *  However for demo' purposes, we're allowed to simulate this by displaying 4 terminals/consoles on the laptop/desktop display, such that each terminal/console will represent one-of-four servers which will contain its own discrete port number so that they can exchange/update information
+    *  However for demo purposes, we're allowed to simulate this by displaying 4 terminals/consoles on the laptop/desktop display, such that each terminal/console will represent one-of-four servers which will contain its own discrete port number so that they can exchange/update information
     *  In this assignment you will implement a simplified version of the Distance Vector Routing Protocol.
     *  The protocol will be run on top of four servers/laptops (behaving as routers) using TCP or UDP.
     *  Each server runs on a machine at a pre-defined port number.
@@ -21,13 +25,42 @@
 *  *This is a little different from the original algorithm which immediately sends
 out update routing information when routing table changes.*
 
-**BUILD**
+### BUILD
 * The initial, (and only) build of the various components, etc, are done via the IDE's Build tool. 
 
-**RUNTIME EXECUTION**
-* One can use "javac dv_routing.java", however it's easier, faster, and more convenient using the IDE's Run shortcut.
-------------------------------------------------------------------------
+### RUNTIME EXECUTION 
 
+* One can use `javac dv_routing.java`, however it's easier, faster, and more convenient using the IDE's Run shortcut.  
+* Each server will have its own node routing-topology table.  
+* Since costs of neighboring nodes will be updatable using the Bellman-Ford algorithm, initial entries will be `"inf"`.  
+  
+&emsp;A note of importance is in reference to the command string:  
+&emsp; &emsp; &emsp; &emsp;`server -t <topology-file-name> -i <routing-update-interval>`
+      
+      
+&emsp;which of course contains 5 arguments. The " -t " is not used in our application.  
+&emsp;So the initial setup command will be of the form:  
+&emsp; &emsp; &emsp; &emsp;`server <topology-file-name> -i <routing-update-interval> , ie., 4 args.`  
+    
+  
+The available user-input commands or queries are exactly the same as what the ASMT2 prompt requires. 
+* Another note of importance are the results of the Display command. Here's a representation of this command:
+
+
+------------------------------------------------------------------------
+# Contributions
+## **Randy**
+* kancjas
+##
+## **Thomas**
+* casdcs
+##
+## **Jessica**
+* sdcdzc 
+##
+## **Al**
+*  vfdsvdf
+##
 
 
 
