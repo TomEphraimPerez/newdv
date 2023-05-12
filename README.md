@@ -77,7 +77,7 @@ server-1 to server-2 is equal to 4",
 ```
 
 ------------------------------------------------------------------------
-# Contributions
+# Group Contributions
 ## **Randy**
 * Participated in group meetings to discuss structure and logic of distance vector program
 * Consistently check in with group members to identify and discuss checkpoints, progress, and troubleshooting
@@ -93,10 +93,8 @@ server-1 to server-2 is equal to 4",
    *  Includes serialization of Node called when creating new node objects in   `dv_routing.java` (the main file)
    *  Used the server id, IP Address, and port fields to calculate a hash code for the Node object
    *  Efficiently add new nodes to the routing table upon intialization
-* Contributed on Crash command --> `disable()`
-   * Calls `disable()` to safely close connections for any given server node ID and remove node from the network topology
-   * Updates `routingTable` to accomodate this change so costs and current nodes and neighbors are updated 
-   * Will throw errors if connection from server or from neighbors cannot be disabled
+* Contributed on Crash command
+   * Basically safely exiting main program by closing ALL connections in the network topology 
 * Set up demo environment, which consists of four virtual machines
    * The virtual machines were connected via a virtual subnet address 10.0.2.x.
    * Additionally, they were configured to generate a random MAC address, otherwise it would use the same MAC as the host machine.
@@ -107,6 +105,7 @@ server-1 to server-2 is equal to 4",
    * Created a video recording to demonstrate various commands of our project using the virtual machine environment. 
 * Took responsibility for merging video recordings together for presentation purposes
    * Compiled all group members' video recordings of each explaining the parts of the code they contributed to during this project
+   * Contributed to troubleshooting issues with other group members who needed help with errors
 
 ##
 ## **Thomas**
@@ -117,12 +116,33 @@ server-1 to server-2 is equal to 4",
    * Responsible for parsing arguments inputted by user in terminal
    * Added throw/catch exceptions in command menu
    * Contributed to logical structure of `readTopology()` and helped troubleshoot errors during program writing of the function
+* Responsible contributing to `step()` and `disable()`
+   * **step() + sendMessage()** 
+      *  This function is to send updated link costs to the server's direct neighbors in the network topology
+      *  The function first creates a step message with the current node's ID, IP address, and port
+      *  It then adds the current node's routing table to the message using the makeMessage() function, which creates a JSON representation of the routing table
+      *  Allows nodes exchange their routing tables with each other to compute the shortest path to all other nodes in the network
+      *  Iterates through each neighbor and calls the sendMessage() function to send the message to each neighbor
+      *  The sendMessage() function first checks if there is a semaphore available to write to the socket channel, and if so, it writes the message to the channel
+      *  The parseChannelIp() function is used to extract the IP address of the socket channel from the selection key
+      *  Required creating a function that could send a message to a specific neighbor node in a network by writing to the corresponding socket channel (read/write sockets using Selector() library)
+      *  It iterates through the SelectionKey objects in the write set returned by the Selector.select() method which represent channels that are ready for writing
+      *  For each SelectionKey, it checks if the IP address of the corresponding channel's endpoint matches the IP address of the eachNeighbor node
+      * If it does, it retrieves the SocketChannel from the SelectionKey and writes the contents of the ByteBuffer to the channel
+      * After all channels that match eachNeighbor's IP address have been written to, it removes the corresponding SelectionKey from the set
+   * **disable()**
+      * Calls `disable()` to safely close connections for any given/specified server node ID and remove node from the network topology
+      * Updates `routingTable` to accomodate this change so costs and current nodes and neighbors are updated 
+      * Will throw errors if connection from server or from neighbors cannot be disabled  
+* Contributed to writing script to overview the basic execution of the program for the demo presentation required for the project
+* Contributed to troubleshooting issues with other group members who needed help with errors  
 ##
 ## **Jessica**
 * Creation and editing of README.md file to comipile group's contribution as well as individual 
+* Contributed to troubleshooting issues with other group members who needed help with errors
 * Participated in group meetings to discuss structure and logic of distance vector program
 * Consistently check in with group members to identify and discuss checkpoints, progress, and troubleshooting 
-* Assigned to focus on developing functions for commands `display()` and `update()` in conjunction with other basic functions that fetched neighbor node IDs needed to create new strings that contains new link costs to neighbors
+* Assigned to focus on contributing functions for commands `display()` and `update()` in conjunction with other basic functions that fetched neighbor node IDs needed to create new strings that contains new link costs to neighbors
 * **display()**
    * Created initialized topology table with infinity values to indicate no cost to nodes that were not direct neighbors.
    * Developed a getNodeId function to properly identify the current’s server’s node identification and it’s neighbor’s id with its corresponding IP address and port (given by the topology file).
@@ -143,10 +163,9 @@ server-1 to server-2 is equal to 4",
    * However, in the case that `toNeighbor` is set but it’s not a neighbor or if the neighbor to the current server node is **NOT** a neighbor, an `IllegalArgumentException` is thrown to let the  user know that either the one of the servers passed as argument needs to be the current one they are on **OR** that the given server ID is not a neighbor of ther current server.
    * If all is valid, then the `routingTable` is called to add a new link cost entry for the given nodes and an update message is sent to let the server and the neighbor node that the update is successful.
    * To make sure display and update work properly, these functions also required other functions to retrieve node ID for any given node or to create a string of values containing the nodes and link cost.
-* **isNeighbor(Node serverNode)**
+* **isNeighbor(Node serverNode) + List<String> makeMessage()**
    * A static boolean function that simply returns the neighbor node's server ID when called by `update()` to perform a boolean check on the nodes passed in as arguments 
    * A invalid neighbor node or non-existing neighbor node will throw an `IllegalArgumentException` which means that the arguments passed into the function are not valid
-* **List<String> makeMessage()**
    * Needed to create a new string that appends new link cost values of `source node -> destination node`
    * This function is called by `update()` whenever uses specifies new link cost between two neighbor nodes (direct neighbors)
    * String should be read in as is when being entered as a new entry for `routingTable`
@@ -155,7 +174,7 @@ server-1 to server-2 is equal to 4",
 ## **Al**
 *  Participated in group meetings to discuss structure and logic of distance vector program
 *  Consistently check in with group members to identify and discuss checkpoints, progress, and troubleshooting
-*   
+*  Contributed to troubleshooting issues with other group members who needed help with errors
 ##
 
 
