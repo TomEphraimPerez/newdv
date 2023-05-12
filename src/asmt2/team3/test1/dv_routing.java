@@ -63,10 +63,11 @@ public class dv {
 		System.out.println("Client started running...");
 		myIP = getMyLANip();									//myIP of course rtns the local IP.
 		
+		boolean run = true;
+		boolean isCommandInput = false;
 		Timer timer = new Timer();
 		Scanner in = new Scanner(System.in);
-		boolean run = true;
-		boolean serverCommandInput = false;
+		
 		while(run) {
 			System.out.println("\n");
 			System.out.println("Distance Vector Routing Protocol");
@@ -84,7 +85,7 @@ public class dv {
 			switch(command) { 									// USE ONLY 4 ARGS
 			case "server":
 				if(arg.length != 4){
-					System.out.println("Invalid input. Re-input.");
+					System.out.println("Invalid input. Try re-input.");
 					break;
 				}
 				try{
@@ -96,11 +97,11 @@ public class dv {
 					break;
 				}
 				if((arg[1] == "" || arg[2] == "" || !arg[2].equals("-i") || arg[3] == "")){
-					System.out.println("Invalid input. Re-input please.");
+					System.out.println("Invalid input. Try re-input.");
 					break;
 				}
 				else{
-					serverCommandInput = true;
+					isCommandInput = true;
 					String filename = arg[1];
 					time = Integer.parseInt(arg[3]);
 					readTopology(filename);
@@ -117,31 +118,31 @@ public class dv {
 				}
 				break;
 			case "update": //update <server-id1> <server-id2> <link Cost>
-				if(serverCommandInput)
+				if(isCommandInput)
 					update(Integer.parseInt(arg[1]),Integer.parseInt(arg[2]),Integer.parseInt(arg[3]));
 				else
 					System.out.println("Enter the server command.");
 				break;
 			case "step":
-				if(serverCommandInput)
+				if(isCommandInput)
 					step();
 				else
 					System.out.println("Enter the server command.");
 				break;
 			case "packets":
-				if(serverCommandInput)
+				if(isCommandInput)
 					System.out.println("Packets received; "+ numPktsReceived);
 				else
 					System.out.println("Enter the server command.");
 				break;
 			case "display":
-				if(serverCommandInput)
+				if(isCommandInput)
 					display();
 				else
 					System.out.println("Enter the server command.");
 				break;
 			case "disable":
-				if(serverCommandInput){
+				if(isCommandInput){
 					int id = Integer.parseInt(arg[1]);
 					Node disableServer = getNodeById(id);
 					disable(disableServer);
@@ -150,7 +151,7 @@ public class dv {
 					System.out.println("Enter the server command.");
 				break;
 			case "crash":
-				if(serverCommandInput){
+				if(isCommandInput){
 					run = false;
 					for(Node eachNeighbor:neighbors){
 						disable(eachNeighbor);
@@ -163,7 +164,7 @@ public class dv {
 					System.out.println("Enter the server command.");
 				break;
 				default:
-					System.out.println("ERROR: re-enter.");
+					System.out.println("ERROR: Re-enter.");
 			}
 		}
 		in.close();
@@ -187,6 +188,37 @@ public class dv {
 		    }
 		} catch (SocketException e) {
 		    throw new RuntimeException(e);
+		}
+		return null;
+	}
+		public static void connect(String ip, int port, int id) {
+		System.out.println("Connecting to IP: " + ip);
+		try {
+			if(!ip.equals(myIP)) {
+
+				SocketChannel socketChannel = SocketChannel.open();
+				socketChannel.connect(new InetSocketAddress(ip,port));
+				socketChannel.configureBlocking(false);
+				socketChannel.register(read, SelectionKey.OP_READ);
+				socketChannel.register(write,SelectionKey.OP_WRITE);
+				openChannels.add(socketChannel);
+				System.out.println(" - -> ");
+				System.out.println("Connected to "+ip);
+			}
+			else {
+				System.out.println("You can't connect to yourself");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public static Node getNodeByIP(String ipAddress){
+		for(Node node:nodes){
+			if(node.getIpAddress().equals(ipAddress)){
+				return node;
+			}
 		}
 		return null;
 	}
@@ -250,82 +282,41 @@ public class dv {
 		return null;
 	}
 
-	public static void update(int serverId1, int serverId2, int cost) throws IOException {
-		if(serverId1 == myID){
-			Node to = getNodeById(serverId2);
-			if(isNeighbor(to)){
-				routingTable.put(to, cost);
-				Message message = new Message(myNode.getId(),myNode.getIpAddress(),myNode.getPort(),"update");
-				message.setRoutingTable(makeMessage());
-				sendMessage(to,message);
-				System.out.println("Message sent to "+to.getIpAddress());
-				System.out.println("Update success");
-			}
-			else{
-				System.out.println("You can only update cost to your own neighbor!");
-			}
+	public static void update(int serverId1, int serverId2, int cost) IOException{
+		//  create null variable before setting any server node to this
+		Node toNeighbor = null;
+		if(serverId1 == myID) {
+			toNeighbor = getNodeById(serverId2);
 		}
-		if(serverId2 == myID){
-			Node to = getNodeById(serverId1);
-			if(isNeighbor(to)){
-				routingTable.put(to, cost);
-				Message message = new Message(myNode.getId(),myNode.getIpAddress(),myNode.getPort(),"update");
-				message.setRoutingTable(makeMessage());
-				sendMessage(to,message);
-				System.out.println("Message sent to "+to.getIpAddress());
-				System.out.println("Update success");
-			}
-			else{
-				System.out.println("You can only update cost to your own neighbor!");
-			}
+		if(serverId2 == myID) {
+			toNeighbor = getNodeById(serverId1);
 		}
+		//  if the first 2 checks didnt pass and toNeighbor is not set to anything
+		// this just means tehre was no neighbor of the current server node
+		if (toNeighbor == null) {
+        		throw new IllegalArgumentException("One of the servers must be the current server");
+   		}
+		if (!isNeighbor(neighborNode)) {
+    			throw new IllegalArgumentException("The given Server ID is not a neighbor of the current server");
+    		}
+		routingTable.put(toID, cost);
+		Message updateMsg = new Message(myNode.getId(),myNode.getIpAddress(),myNode.getPort(),"update");
+		updateMsg.setRoutingTable(makeMessage());
+		sendMessage(to,updateMsg);
+		System.out.println("Update message sent to "+toID.getIpAddress());
+		System.out.println("Update: SUCCESS");
 	}
 	
-	public static boolean isNeighbor(Node server){
-		if(neighbors.contains(server))
-			return true;
-		return false;
-	}
-	public static List<String> makeMessage(){
-		List<String> message = new ArrayList<String>();		// The dbl arrow <-> unfolds to 'String'
-		for (Map.Entry < Node, Integer > entry : routingTable.entrySet()) {
-		    Node key = entry.getKey();					// via import java.util.Map;
-		    Integer value = entry.getValue();			// via import java.util.Map;
-		    message.add(key.getId() + "#" +value);
-		}
-		return message;
-	}
-	public static void connect(String ip, int port, int id) {
-		System.out.println("Connecting to IP: " + ip);
-		try {
-			if(!ip.equals(myIP)) {
-
-				SocketChannel socketChannel = SocketChannel.open();
-				socketChannel.connect(new InetSocketAddress(ip,port));
-				socketChannel.configureBlocking(false);
-				socketChannel.register(read, SelectionKey.OP_READ);
-				socketChannel.register(write,SelectionKey.OP_WRITE);
-				openChannels.add(socketChannel);
-				System.out.println(" - -> ");
-				System.out.println("Connected to "+ip);
-			}
-			else {
-				System.out.println("Can't connect to yourself");
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+	public static boolean isNeighbor(Node serverNode) {
+    		return neighbors.contains(serverNode);
 	}
 	
-	
-	public static Node getNodeByIP(String ipAddress){
-		for(Node node:nodes){
-			if(node.getIpAddress().equals(ipAddress)){
-				return node;
-			}
-		}
-		return null;
+	public static List<String> makeMessage() {
+    	return routingTable.entrySet().stream()
+            .map(entry -> entry.getKey().getId() + "#" + entry.getValue())
+            .collect(Collectors.toList());
 	}
+	
 
 	public static void step() throws IOException{
 		if(neighbors.size() >= 1){					// 'neighbors' is an obj of type Node in a set of nodes.
@@ -335,7 +326,7 @@ public class dv {
 				sendMessage(eachNeighbor, message); 			//sending message to each neighbor
 				System.out.println("Message sent to " + eachNeighbor.getIpAddress());
 			}
-			System.out.println("Step SUCCESS");
+			System.out.println("Step: SUCCESS");
 		}
 		else{
 			System.out.println("No neighbors found for step function.");
@@ -378,7 +369,7 @@ public class dv {
 			rawIp = channel.getRemoteAddress().toString().split(":")[0];
 			ip = rawIp.substring(1, rawIp.length());
 		} catch (IOException e) {
-			System.out.println("can't convert channel to ip");
+			System.out.println("Can't convert channel to IP");
 		}
 		return ip;
 	}
@@ -388,11 +379,30 @@ public class dv {
 		try {
 			port = channel.getRemoteAddress().toString().split(":")[1];
 		} catch (IOException e) {
-			System.out.println("can't convert channel to ip");
+			System.out.println("Can't convert channel to IP");
 		}
 		return Integer.parseInt(port);
 	}
 	
+	// displays table 
+	public static void display() {
+		String tableFormat = "%-16s%-22s%-11s%n";
+		System.out.format(tableFormat, "Dest. Server ID", "Next Hop Server ID", "Link Cost");
+		Collections.sort(nodes, new NodeComparator());
+		for (Map.Entry<Node, Integer> entry : routingTable.entrySet()) {
+			Node destNode = entry.getKey();
+			int cost = entry.getValue();
+			/* checks check if cost equals Integer.MAX_VALUE, since that would represent an initial cost of infinity
+		       program would correctly display the initial cost of nodes as "infinity" if that is how it is specified in the text file. */
+			String costStr = cost == Integer.MAX_VALUE ? "infinity" : String.valueOf(cost);
+			// String costStr = cost == Integer.MAX_VALUE - 2 ? "infinity" : String.valueOf(cost); // uncomment if above String coststr doesnt work
+			Node nextHopNode = nextHop.get(destNode);
+			/* shorthand expression to It assigns the value "N.A" to nextHopID if nextHopNode is null, 
+			   and assigns the string representation of nextHopNode's ID to nextHopID otherwise. */
+			String nextHopID = nextHopNode == null ? "INFINITY" : String.valueOf(nextHopNode.getId());
+			System.out.format(format, destNode.getId(), nextHopID, costStr);
+		}
+	}
 	public static boolean disable(Node server) throws IOException{
 		if(isNeighbor(server)){
 			
@@ -417,24 +427,6 @@ public class dv {
 			System.out.println("You can only disable connection with your neighbor!!");
 			return false;
 		}
-	}
-	public static void display() {
-		TableBuilder tb = new TableBuilder();
-		tb.addRow("Destination Server ID","Next Hop Server ID","Cost");
-		Collections.sort(nodes,new NodeComparator());
-		for(Node eachNode:nodes){
-			int cost = routingTable.get(eachNode);
-			String costStr = ""+cost;
-			if(cost==Integer.MAX_VALUE-2){
-				costStr = "inf";
-			}
-			String nextHopID = "N.A";
-			if(nextHop.get(eachNode)!=null){
-				nextHopID = ""+nextHop.get(eachNode).getId(); 
-			}
-			tb.addRow(""+eachNode.getId(),""+nextHopID,costStr);
-		}
-		System.out.println(tb.toString());
 	}
 	
 	
