@@ -139,6 +139,9 @@ Keep in mind that we all overlapped in our duties especially when it came to dis
       * Will throw errors if connection from server or from neighbors cannot be disabled  
 * Contributed to writing script to overview the basic execution of the program for the demo presentation required for the project
 * Contributed to troubleshooting issues with other group members who needed help with errors  
+* Constructed/established public static constants
+* Cleaned up code blocks and individual lines of code after initially ensuring it was working for most commands. 
+
 ##
 ## **Jessica**
 * Creation and editing of README.md file to comipile group's contribution as well as individual 
