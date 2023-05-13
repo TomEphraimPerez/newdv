@@ -114,7 +114,7 @@ Keep in mind that we all overlapped in our duties especially when it came to dis
 ## **Thomas**
 * Participated in group meetings to discuss structure and logic of distance vector program 
 * Consistently check in with group members to identify and discuss checkpoints, progress, and troubleshooting
-* Worked with Randy to build existing `Server.java` and `Client.jav`a from previous project to fit current requirements of Project 2
+* Worked with Randy to build existing `Server.java` and `Client.java` from previous project to fit current requirements of Project 2
 * Contributed on `server -t <topology-file-name> -i <routing-update-interval>` command:
    * Responsible for parsing arguments inputted by user in terminal
    * Added throw/catch exceptions in command menu
@@ -178,9 +178,29 @@ Keep in mind that we all overlapped in our duties especially when it came to dis
    
 ##
 ## **Al**
-*  Participated in group meetings to discuss structure and logic of distance vector program
-*  Consistently check in with group members to identify and discuss checkpoints, progress, and troubleshooting
-*  Contributed to troubleshooting issues with other group members who needed help with errors
+* Participated in group meetings to discuss structure and logic of distance vector program
+* Consistently check in with group members to identify and discuss checkpoints, progress, and troubleshooting
+* Contributed to troubleshooting issues with other group members who needed help with errors
+* Contirbuted to smaller static/void static methods needed to establish TCP connections of sockets upon program startup
+   * Setting up functions that parsed IP addresses, established TCP socket connections, and retrieved LAN IP addresses aside from fetching node IP addresses
+* Contributed Packets function
+   * Using a byte input stream to keep track of sockets that were read and the packets they received
+   * Also using a counter variable to keep track of the number of packets received, initialized to 0 (zero) and should remain zero unless ran twice or more times
+   * This will not be updating during the run but it increments when the whole program is executed after the first time
+   * Once an incoming packet is received, the packet counter is incremented, and the packet data is extracted from the `DatagramPacket` object using the `getData()` and `getLength()` methods.
+* Refactoring the main function for efficiency and clarity
+   * Main function original structure was to lengthy and redudant so started from scratch once more to fix the structure and logic
+   * Included file parsing for topology text files
+   * Also included try/catch and error throwing to ensure that program runs according to its intended behavior specific to project requirements
+* Contributed to file `Message.java`
+   * This file is to set up the private fields id, ipAddress, port, routingTable and type, along with public getter and setter methods for each field
+   * Used to define the structure of the messages that nodes exchange in the network.
+   * The messages contain the sender node's id, ip address, port number, routing table, and the type of message
+   * Since the routing table is represented as a list of strings in the message, the type field can be used to differentiate between different types of messages such as `"step"` or `"update"`
+   * This allows it to make it easy to consistently update `routingTable`
+* Worked on `Server.java` with Randy to also help troubleshoot and workout logic errors that were not previously addressed
+    * There were some issues when it came to reading and writing the sockets that were connected to the server 
+
 ##
 ------------------------------------------------------------------------
 # References
@@ -189,7 +209,13 @@ Keep in mind that we all overlapped in our duties especially when it came to dis
    * Distance Vector Routing Algorithm - https://www.javatpoint.com/distance-vector-routing-algorithm
    * C Program: Distance Vector Routing Algorithm using Bellman Ford's Algorithm - https://www.thelearningpoint.net/computer-science/c-program-distance-vector-routing-algorithm-using-bellman-ford-s-algorithm
    * Bellman Ford's Algorithm - https://www.programiz.com/dsa/bellman-ford-algorithm
-   * 
+   * Distance Vector Routing vs Link State Routing - https://www.educba.com/distance-vector-routing-vs-link-state-routing/
+   * Dan Anderson - https://github.com/DanAndreasson/distance-vector-routing/blob/master/RouterNode.java
+   * Distance Vector Routing Algorithm - https://www.prepbytes.com/blog/computer-network/distance-vector-routing-algorithm/
+   * UCSD Lecture 8: Routing I Distance-vector Algorithms - https://cseweb.ucsd.edu/classes/fa11/cse123-a/123f11_Lec9.pdf
+   * Febin Zachariah - https://github.com/fzachariah/Computer-Networking-Projects/tree/master/Distance%20Vector%20Implementation
+   * EXPT NO.8: Write a program for distance vector algorithm to find suitable path for transmission - https://youtu.be/ibWPhT3nZzw
+   * Distance Vector Routing Algorithm with Example | IIT Lecture Series - https://youtu.be/dmS1t2twFrI
 ------------------------------------------------------------------------
 # About COMP 429 Distance Vector Protocol Project
 ## 1. Problem Statement
