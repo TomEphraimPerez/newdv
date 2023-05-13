@@ -183,6 +183,14 @@ Keep in mind that we all overlapped in our duties especially when it came to dis
 *  Contributed to troubleshooting issues with other group members who needed help with errors
 ##
 ------------------------------------------------------------------------
+# References
+   * Distance Vector Routing (DVR) Protocol - https://www.geeksforgeeks.org/distance-vector-routing-dvr-protocol/
+   * Route Poisoning and Count to infinity problem in Routing - https://www.geeksforgeeks.org/route-poisoning-and-count-to-infinity-problem-in-routing/
+   * Distance Vector Routing Algorithm - https://www.javatpoint.com/distance-vector-routing-algorithm
+   * C Program: Distance Vector Routing Algorithm using Bellman Ford's Algorithm - https://www.thelearningpoint.net/computer-science/c-program-distance-vector-routing-algorithm-using-bellman-ford-s-algorithm
+   * Bellman Ford's Algorithm - https://www.programiz.com/dsa/bellman-ford-algorithm
+   * 
+------------------------------------------------------------------------
 # About COMP 429 Distance Vector Protocol Project
 ## 1. Problem Statement
 In this assignment you will implement a simplified version of the Distance Vector Routing Protocol.
